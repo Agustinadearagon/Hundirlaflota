@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hundir la Flota</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1b2a">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
+html, body { background: #0d1b2a; color: white; font-family: Helvetica, Arial, sans-serif; min-height: 100%; overflow-x: hidden; }
+#app { display: flex; flex-direction: column; align-items: center; padding-bottom: 24px; }
+
+/* ── Pantallas ── */
+.screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 440px; padding: 0 12px; }
+.screen.on { display: flex; }
+
+h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; letter-spacing: 2px; }
+.sub { font-size: 13px; color: #8899aa; text-align: center; margin-bottom: 16px; }
+
+.btn { width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 5px 0; color: white; }
+.btn-blue  { background: #1a5276; border: 1px solid #00d4ff; color: #00d4ff; }
+.btn-green { background: #1e8449; }
+.btn-grey  { background: #2c3e50; color: #aaaaaa; }
+.btn-red   { background: #922b21; }
+.btn-menu  { background: #1a3a5c; color: #00d4ff; border: 1px solid #00d4ff; }
+
+.row2 { display: flex; gap: 8px; width: 100%; margin: 5px 0; }
+.row2 .btn { margin: 0; flex: 1; }
+
+/* ── Reglas ── */
+.rules { background: #0a2236; border: 1px solid #1a5276; border-radius: 8px; padding: 14px; font-size: 13px; color: #ccddee; line-height: 1.7; width: 100%; margin-bottom: 14px; }
+.rules b { color: #00d4ff; }
+
+/* ── Tabs ── */
+.tabs { display: flex; width: 100%; margin-bottom: 8px; gap: 6px; }
+.tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+.tab.active { border-color: #00d4ff; color: #00d4ff; background: #0a2236; }
+.tab.inactive { color: #556677; background: #0a1520; }
+
+/* ── Tablero ── */
+.board-wrap { position: relative; margin: 0 auto; }
+.board-labels-top { display: flex; padding-left: 20px; }
+.board-labels-top span, .board-row-num { font-size: 11px; color: #556677; text-align: center; display: flex; align-items: center; justify-content: center; }
+.board-row { display: flex; }
+.cell {
+  border: 1px solid #1a3a5c;
+  background: #0a2236;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background 0.1s;
+  position: relative;
+}
+.cell.ship   { background: #1e6b3c; }
+.cell.placing{ background: #c0851a; }
+.cell.invalid{ background: #7b241c; }
+.cell.hit    { background: #922b21; }
+.cell.miss   { background: #1a3a5c; }
+.cell.sunk   { background: #6e1c15; }
+.cell.hover  { background: #1a5276; }
+
+/* ── Panel barcos ── */
+.fleet-panel { width: 100%; background: #0a1e30; border: 1px solid #1a3a5c; border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
+.fleet-panel h3 { font-size: 13px; color: #8899aa; margin-bottom: 8px; }
+.fleet-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #0d2a40; font-size: 13px; }
+.fleet-item:last-child { border-bottom: none; }
+.fleet-item.done { color: #556677; text-decoration: line-through; }
+.fleet-item.active { color: #ffcc00; font-weight: bold; }
+.fleet-item.pending { color: #ccddee; }
+.fleet-seg { display: flex; gap: 2px; }
+.fleet-seg span { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.seg-g { background: #2ecc71; }
+.seg-y { background: #f39c12; }
+.seg-d { background: #556677; }
+
+/* ── Info turno ── */
+#lbl-turno { font-size: 14px; text-align: center; padding: 8px; min-height: 36px; }
+
+/* ── Olas animación ── */
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.ripple-fx {
+  position: absolute; width: 80%; height: 80%;
+  border-radius: 50%; border: 2px solid #00d4ff;
+  animation: ripple 0.5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes boom {
+  0%   { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.boom-fx {
+  position: absolute; width: 90%; height: 90%;
+  border-radius: 50%; background: #ff6b00;
+  animation: boom 0.4s ease-out forwards;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ MENÚ ══ -->
+<div class="screen on" id="s-menu">
+  <h1>⚓ HUNDIR LA FLOTA</h1>
+  <p class="sub">1 jugador vs IA</p>
+  <div class="rules">
+    <b>Flota (tablero 8×8):</b><br>
+    🟦 Portaaviones — 4 casillas<br>
+    🟦 Destructor — 3 casillas<br>
+    🟦 Submarino — 2 casillas<br>
+    🟦 Lancha — 1 casilla<br><br>
+    <b>Cómo jugar:</b><br>
+    1. Coloca tus 4 barcos en el tablero.<br>
+    2. Toca <b>Mar enemigo</b> para disparar.<br>
+    3. 💥 = tocado · ● = agua<br>
+    4. Hunde todos los barcos enemigos para ganar.
+  </div>
+  <button class="btn btn-green" onclick="irColocar()">▶ JUGAR</button>
+</div>
+
+<!-- ══ COLOCAR BARCOS ══ -->
+<div class="screen" id="s-colocar">
+  <h1>⚓ COLOCA TU FLOTA</h1>
+  <p class="sub" id="lbl-colocar">Coloca el Portaaviones (4)</p>
+
+  <div id="board-colocar"></div>
+
+  <div class="fleet-panel">
+    <h3>Barcos a colocar:</h3>
+    <div id="fleet-list"></div>
+  </div>
+
+  <div class="row2">
+    <button class="btn btn-blue" onclick="rotar()">↻ Rotar</button>
+    <button class="btn btn-grey" onclick="colocarAleatorio()">🎲 Aleatorio</button>
+  </div>
+  <div class="row2" style="margin-top:4px;">
+    <button class="btn btn-grey" onclick="irMenu()">← Menú</button>
+    <button class="btn btn-green" id="btn-empezar" onclick="empezarBatalla()" disabled style="opacity:0.4">Empezar ▶</button>
+  </div>
+</div>
+
+<!-- ══ BATALLA ══ -->
+<div class="screen" id="s-batalla">
+  <h1 style="margin-bottom:6px;">⚓ BATALLA</h1>
+  <div id="lbl-turno"></div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-tuyo" onclick="verTab('tuyo')">Tu mar</div>
+    <div class="tab inactive" id="tab-enemigo" onclick="verTab('enemigo')">Mar enemigo</div>
+  </div>
+
+  <div id="board-batalla"></div>
+
+  <div class="fleet-panel" id="panel-batalla">
+    <h3 id="panel-titulo">Tu flota:</h3>
+    <div id="fleet-batalla"></div>
+  </div>
+
+  <div class="row2" style="margin-top:8px;">
+    <button class="btn btn-grey" onclick="irMenu()">← Menú</button>
+    <button class="btn btn-blue" onclick="irColocar()">Reiniciar</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ════════════════════════════════════════
+// DATOS
+// ════════════════════════════════════════
+const BARCOS_DEF = [
+  { nombre: 'Portaaviones', tam: 4 },
+  { nombre: 'Destructor',   tam: 3 },
+  { nombre: 'Submarino',    tam: 2 },
+  { nombre: 'Lancha',       tam: 1 },
+];
+const N = 8;
+
+// ════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════
+let csSize = 0;
+let orientacion = 'H'; // H | V
+let barcosJugador = [];  // [{nombre,tam,celdas:[{f,c}]}]
+let barcosIA = [];
+let barcoIdx = 0;        // índice barco actual en colocación
+
+let tableroJugador = []; // N×N: null | 'ship' | 'hit' | 'sunk'
+let tableroIA = [];      // N×N: null | 'ship' | 'hit' | 'miss' | 'sunk'
+let tableroJugadorVisto = []; // lo que ve el jugador de su mar
+
+let tabActual = 'tuyo';
+let turnoJugador = true;
+let juegoActivo = false;
+
+let hoverCeldas = [];
+
+// ════════════════════════════════════════
+// NAVEGACIÓN
+// ════════════════════════════════════════
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); document.getElementById(id).classList.add('on'); }
+function irMenu(){ juegoActivo=false; show('s-menu'); }
+
+function irColocar(){
+  barcosJugador=[];
+  barcoIdx=0;
+  orientacion='H';
+  hoverCeldas=[];
+  initTablero(tableroJugador);
+  show('s-colocar');
+  calcCS('board-colocar');
+  renderColocar();
+  renderFleetList();
+}
+
+function irBatalla(){
+  show('s-batalla');
+  calcCS('board-batalla');
+  tabActual='tuyo';
+  activarTab('tuyo');
+  renderBatalla();
+  renderFleetBatalla();
+}
+
+// ════════════════════════════════════════
+// UTILIDADES TABLERO
+// ════════════════════════════════════════
+function initTablero(t){ for(let i=0;i<N;i++){t[i]=[];for(let j=0;j<N;j++)t[i][j]=null;} }
+
+function calcCS(containerId){
+  const maxW = Math.min(window.innerWidth - 24, 440);
+  csSize = Math.floor((maxW - 20) / (N + 0.5));
+}
+
+function celdaId(prefix,f,c){ return prefix+'-'+f+'-'+c; }
+
+function buildBoard(containerId, prefix, clickFn, hoverFn, hoverOutFn){
+  const cont = document.getElementById(containerId);
+  cont.innerHTML='';
+  const labW = 20, total = labW + N*csSize;
+
+  // fila etiquetas superior
+  const topRow = document.createElement('div');
+  topRow.style.cssText=`display:flex;padding-left:${labW}px;`;
+  'ABCDEFGH'.split('').forEach(l=>{
+    const s=document.createElement('span');
+    s.textContent=l;
+    s.style.cssText=`width:${csSize}px;font-size:11px;color:#556677;text-align:center;`;
+    topRow.appendChild(s);
+  });
+  cont.appendChild(topRow);
+
+  for(let f=0;f<N;f++){
+    const row=document.createElement('div');
+    row.style.display='flex';
+    // número fila
+    const num=document.createElement('span');
+    num.textContent=f+1;
+    num.style.cssText=`width:${labW}px;font-size:11px;color:#556677;display:flex;align-items:center;justify-content:center;`;
+    row.appendChild(num);
+    for(let c=0;c<N;c++){
+      const cell=document.createElement('div');
+      cell.id=celdaId(prefix,f,c);
+      cell.className='cell';
+      cell.style.cssText=`width:${csSize}px;height:${csSize}px;border:1px solid #1a3a5c;background:#0a2236;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:${Math.floor(csSize*0.5)}px;position:relative;transition:background 0.1s;`;
+      if(clickFn) cell.addEventListener('click',()=>clickFn(f,c));
+      if(hoverFn) cell.addEventListener('mouseenter',()=>hoverFn(f,c));
+      if(hoverOutFn) cell.addEventListener('mouseleave',hoverOutFn);
+      if(hoverFn){ cell.addEventListener('touchmove',e=>{
+        e.preventDefault();
+        const t=e.touches[0];
+        const el=document.elementFromPoint(t.clientX,t.clientY);
+        if(el && el.dataset.f!==undefined) hoverFn(parseInt(el.dataset.f),parseInt(el.dataset.c));
+      },{passive:false}); }
+      cell.dataset.f=f; cell.dataset.c=c;
+      row.appendChild(cell);
+    }
+    cont.appendChild(row);
+  }
+}
+
+function setCell(prefix,f,c,{bg,txt}={}){
+  const el=document.getElementById(celdaId(prefix,f,c));
+  if(!el) return;
+  if(bg!==undefined) el.style.background=bg;
+  if(txt!==undefined) el.textContent=txt;
+}
+
+function addFx(prefix,f,c,tipo){
+  const el=document.getElementById(celdaId(prefix,f,c));
+  if(!el) return;
+  const fx=document.createElement('div');
+  fx.className= tipo==='boom'?'boom-fx':'ripple-fx';
+  el.appendChild(fx);
+  setTimeout(()=>fx.remove(),600);
+}
+
+// ════════════════════════════════════════
+// FASE COLOCAR
+// ════════════════════════════════════════
+function renderColocar(){
+  buildBoard('board-colocar','pc', clickColocar, hoverColocar, hoverSalir);
+  refrescarTableroColocar();
+}
+
+function refrescarTableroColocar(){
+  // fondo limpio
+  for(let f=0;f<N;f++) for(let c=0;c<N;c++) setCell('pc',f,c,{bg:'#0a2236',txt:''});
+  // barcos ya puestos
+  barcosJugador.forEach(b=> b.celdas.forEach(({f,c})=> setCell('pc',f,c,{bg:'#1e6b3c'})));
+  // hover
+  if(hoverCeldas.length){
+    const valido = hoverCeldas.every(({f,c})=>f>=0&&f<N&&c>=0&&c<N&&tableroJugador[f][c]===null);
+    hoverCeldas.forEach(({f,c})=>{ if(f>=0&&f<N&&c>=0&&c<N) setCell('pc',f,c,{bg: valido?'#c0851a':'#7b241c'}); });
+  }
+}
+
+function celdas_barco(f,c,tam,ori){
+  const res=[];
+  for(let i=0;i<tam;i++) res.push(ori==='H'?{f,c:c+i}:{f:f+i,c});
+  return res;
+}
+
+function hoverColocar(f,c){
+  if(barcoIdx>=BARCOS_DEF.length) return;
+  hoverCeldas=celdas_barco(f,c,BARCOS_DEF[barcoIdx].tam,orientacion);
+  refrescarTableroColocar();
+}
+function hoverSalir(){ hoverCeldas=[]; refrescarTableroColocar(); }
+
+function clickColocar(f,c){
+  if(barcoIdx>=BARCOS_DEF.length) return;
+  const def=BARCOS_DEF[barcoIdx];
+  const celdas=celdas_barco(f,c,def.tam,orientacion);
+  const valido=celdas.every(({f:ff,c:cc})=>ff>=0&&ff<N&&cc>=0&&cc<N&&tableroJugador[ff][cc]===null);
+  if(!valido) return;
+  celdas.forEach(({f:ff,c:cc})=>tableroJugador[ff][cc]='ship');
+  barcosJugador.push({...def, celdas});
+  barcoIdx++;
+  hoverCeldas=[];
+  refrescarTableroColocar();
+  renderFleetList();
+  actualizarLblColocar();
+  if(barcoIdx>=BARCOS_DEF.length){
+    document.getElementById('btn-empezar').disabled=false;
+    document.getElementById('btn-empezar').style.opacity='1';
+  }
+}
+
+function rotar(){ orientacion=orientacion==='H'?'V':'H'; refrescarTableroColocar(); }
+
+function actualizarLblColocar(){
+  const lbl=document.getElementById('lbl-colocar');
+  if(barcoIdx<BARCOS_DEF.length){
+    const d=BARCOS_DEF[barcoIdx];
+    lbl.textContent=`Coloca el ${d.nombre} (${d.tam})`;
+  } else {
+    lbl.textContent='¡Flota lista! Pulsa Empezar.';
+  }
+}
+
+function renderFleetList(){
+  const cont=document.getElementById('fleet-list');
+  cont.innerHTML='';
+  BARCOS_DEF.forEach((d,i)=>{
+    const div=document.createElement('div');
+    div.className='fleet-item '+(i<barcoIdx?'done':i===barcoIdx?'active':'pending');
+    const segs=document.createElement('div');
+    segs.className='fleet-seg';
+    for(let s=0;s<d.tam;s++){
+      const sq=document.createElement('span');
+      sq.className=i<barcoIdx?'seg-d':i===barcoIdx?'seg-y':'seg-g';
+      segs.appendChild(sq);
+    }
+    div.appendChild(segs);
+    const txt=document.createElement('span');
+    txt.textContent=(i<barcoIdx?'✓ ':i===barcoIdx?'▶ ':'  ')+d.nombre+' ('+d.tam+')';
+    div.appendChild(txt);
+    cont.appendChild(div);
+  });
+}
+
+function colocarAleatorio(){
+  // reset
+  initTablero(tableroJugador);
+  barcosJugador=[];
+  barcoIdx=0;
+  BARCOS_DEF.forEach(def=>{
+    let placed=false, tries=0;
+    while(!placed && tries<500){
+      tries++;
+      const ori=Math.random()<0.5?'H':'V';
+      const f=Math.floor(Math.random()*N);
+      const c=Math.floor(Math.random()*N);
+      const celdas=celdas_barco(f,c,def.tam,ori);
+      const ok=celdas.every(({f:ff,c:cc})=>ff>=0&&ff<N&&cc>=0&&cc<N&&tableroJugador[ff][cc]===null);
+      if(ok){ celdas.forEach(({f:ff,c:cc})=>tableroJugador[ff][cc]='ship'); barcosJugador.push({...def,celdas}); barcoIdx++; placed=true; }
+    }
+  });
+  hoverCeldas=[];
+  refrescarTableroColocar();
+  renderFleetList();
+  actualizarLblColocar();
+  document.getElementById('btn-empezar').disabled=false;
+  document.getElementById('btn-empezar').style.opacity='1';
+}
+
+// ════════════════════════════════════════
+// INICIO BATALLA
+// ════════════════════════════════════════
+function empezarBatalla(){
+  if(barcoIdx<BARCOS_DEF.length) return;
+  // IA coloca barcos
+  initTablero(tableroIA);
+  barcosIA=[];
+  BARCOS_DEF.forEach(def=>{
+    let placed=false, tries=0;
+    while(!placed && tries<500){
+      tries++;
+      const ori=Math.random()<0.5?'H':'V';
+      const f=Math.floor(Math.random()*N);
+      const c=Math.floor(Math.random()*N);
+      const celdas=celdas_barco(f,c,def.tam,ori);
+      const ok=celdas.every(({f:ff,c:cc})=>ff>=0&&ff<N&&cc>=0&&cc<N&&tableroIA[ff][cc]===null);
+      if(ok){ celdas.forEach(({f:ff,c:cc})=>tableroIA[ff][cc]='ship'); barcosIA.push({...def,celdas,hundido:false}); placed=true; }
+    }
+  });
+  // init visto jugador
+  initTablero(tableroJugadorVisto);
+  for(let f=0;f<N;f++) for(let c=0;c<N;c++) tableroJugadorVisto[f][c]=tableroJugador[f][c];
+  turnoJugador=true;
+  juegoActivo=true;
+  iaMemoria={pendientes:[], disparados:new Set()};
+  irBatalla();
+}
+
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+function verTab(tab){
+  tabActual=tab;
+  activarTab(tab);
+  renderBatalla();
+  renderFleetBatalla();
+}
+function activarTab(tab){
+  document.getElementById('tab-tuyo').className='tab '+(tab==='tuyo'?'active':'inactive');
+  document.getElementById('tab-enemigo').className='tab '+(tab==='enemigo'?'active':'inactive');
+}
+
+// ════════════════════════════════════════
+// RENDERIZAR BATALLA
+// ════════════════════════════════════════
+function renderBatalla(){
+  if(tabActual==='tuyo'){
+    buildBoard('board-batalla','pb',null,null,null);
+    pintarTableroJugador();
+  } else {
+    buildBoard('board-batalla','pb', juegoActivo&&turnoJugador?clickEnemigo:null, null, null);
+    pintarTableroIA();
+  }
+  actualizarLblTurno();
+}
+
+function pintarTableroJugador(){
+  for(let f=0;f<N;f++) for(let c=0;c<N;c++){
+    const v=tableroJugadorVisto[f][c];
+    let bg='#0a2236', txt='';
+    if(v==='ship') bg='#1e6b3c';
+    if(v==='hit'){ bg='#922b21'; txt='💥'; }
+    if(v==='sunk'){ bg='#6e1c15'; txt='💥'; }
+    if(v==='miss'){ bg='#0a2a4a'; txt='●'; }
+    setCell('pb',f,c,{bg,txt});
+  }
+}
+
+function pintarTableroIA(){
+  for(let f=0;f<N;f++) for(let c=0;c<N;c++){
+    const v=tableroIA[f][c];
+    let bg='#0a2236', txt='';
+    if(v==='hit'){ bg='#922b21'; txt='💥'; }
+    if(v==='sunk'){ bg='#6e1c15'; txt='💥'; }
+    if(v==='miss'){ bg='#0a2a4a'; txt='●'; }
+    setCell('pb',f,c,{bg,txt});
+  }
+}
+
+function actualizarLblTurno(){
+  const lbl=document.getElementById('lbl-turno');
+  if(!juegoActivo){ lbl.textContent=''; return; }
+  if(turnoJugador){
+    lbl.style.color='#00d4ff';
+    lbl.textContent= tabActual==='enemigo' ? '🎯 Toca para disparar' : '👁 Viendo tu mar';
+  } else {
+    lbl.style.color='#ff6b6b';
+    lbl.textContent='⏳ La IA está disparando...';
+  }
+}
+
+function renderFleetBatalla(){
+  const titulo=document.getElementById('panel-titulo');
+  const cont=document.getElementById('fleet-batalla');
+  cont.innerHTML='';
+  const esIA=tabActual==='enemigo';
+  titulo.textContent= esIA ? 'Flota enemiga:' : 'Tu flota:';
+  const barcos= esIA ? barcosIA : barcosJugador;
+  barcos.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='fleet-item '+(b.hundido?'done':'pending');
+    const segs=document.createElement('div');
+    segs.className='fleet-seg';
+    b.celdas.forEach(({f,c})=>{
+      const sq=document.createElement('span');
+      const t= esIA ? tableroIA[f][c] : tableroJugadorVisto[f][c];
+      sq.style.cssText=`width:14px;height:14px;border-radius:2px;display:inline-block;background:${
+        b.hundido?'#6e1c15': t==='hit'||t==='sunk'?'#e74c3c': t==='ship'?'#2ecc71':'#556677'};`;
+      segs.appendChild(sq);
+    });
+    div.appendChild(segs);
+    const txt=document.createElement('span');
+    txt.textContent=(b.hundido?'✓ ':'')+b.nombre+(b.hundido?' — HUNDIDO':'');
+    div.appendChild(txt);
+    cont.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════
+// DISPARAR (JUGADOR)
+// ════════════════════════════════════════
+function clickEnemigo(f,c){
+  if(!juegoActivo||!turnoJugador) return;
+  const v=tableroIA[f][c];
+  if(v==='hit'||v==='miss'||v==='sunk') return;
+  if(v==='ship'){
+    tableroIA[f][c]='hit';
+    addFx('pb',f,c,'boom');
+    // ¿hundido?
+    const barco=barcosIA.find(b=>b.celdas.some(p=>p.f===f&&p.c===c));
+    if(barco && barco.celdas.every(({f:ff,c:cc})=>tableroIA[ff][cc]==='hit'||tableroIA[ff][cc]==='sunk')){
+      barco.celdas.forEach(({f:ff,c:cc})=>tableroIA[ff][cc]='sunk');
+      barco.hundido=true;
+    }
+  } else {
+    tableroIA[f][c]='miss';
+    addFx('pb',f,c,'ripple');
+  }
+  pintarTableroIA();
+  renderFleetBatalla();
+  if(verificarFinJugador()) return;
+  turnoJugador=false;
+  actualizarLblTurno();
+  setTimeout(turnoIA,900);
+}
+
+function verificarFinJugador(){
+  if(barcosIA.every(b=>b.hundido)){
+    fin('¡¡VICTORIA!! Hundiste toda la flota enemiga 🎉','#00d4ff');
+    return true;
+  }
+  return false;
+}
+
+// ════════════════════════════════════════
+// IA — lógica de caza
+// ════════════════════════════════════════
+let iaMemoria={pendientes:[], disparados:new Set()};
+
+function turnoIA(){
+  if(!juegoActivo) return;
+  let objetivo=null;
+  // si hay celdas pendientes de explorar
+  while(iaMemoria.pendientes.length && !objetivo){
+    const p=iaMemoria.pendientes.shift();
+    if(!iaMemoria.disparados.has(p.f+','+p.c)) objetivo=p;
+  }
+  // si no, disparo aleatorio (evita zonas sin barcos con peso)
+  if(!objetivo){
+    let intentos=0;
+    while(!objetivo && intentos<200){
+      intentos++;
+      const f=Math.floor(Math.random()*N);
+      const c=Math.floor(Math.random()*N);
+      if(!iaMemoria.disparados.has(f+','+c)){
+        // checkerboard bias
+        if((f+c)%2===0||Math.random()<0.35) objetivo={f,c};
+      }
+    }
+  }
+  if(!objetivo) return;
+
+  const {f,c}=objetivo;
+  iaMemoria.disparados.add(f+','+c);
+  const v=tableroJugadorVisto[f][c];
+
+  if(v==='ship'){
+    tableroJugadorVisto[f][c]='hit';
+    // añadir adyacentes
+    [[f-1,c],[f+1,c],[f,c-1],[f,c+1]].forEach(([nf,nc])=>{
+      if(nf>=0&&nf<N&&nc>=0&&nc<N&&!iaMemoria.disparados.has(nf+','+nc))
+        iaMemoria.pendientes.unshift({f:nf,c:nc});
+    });
+    // ¿hundido?
+    const barco=barcosJugador.find(b=>b.celdas.some(p=>p.f===f&&p.c===c));
+    if(barco && barco.celdas.every(({f:ff,c:cc})=>tableroJugadorVisto[ff][cc]==='hit'||tableroJugadorVisto[ff][cc]==='sunk')){
+      barco.celdas.forEach(({f:ff,c:cc})=>tableroJugadorVisto[ff][cc]='sunk');
+      barco.hundido=true;
+      iaMemoria.pendientes=[];
+    }
+  } else {
+    tableroJugadorVisto[f][c]='miss';
+  }
+
+  // animar si estamos viendo tu mar
+  if(tabActual==='tuyo'){
+    const hit=tableroJugadorVisto[f][c]==='hit'||tableroJugadorVisto[f][c]==='sunk';
+    addFx('pb',f,c,hit?'boom':'ripple');
+    pintarTableroJugador();
+    renderFleetBatalla();
+  }
+
+  if(barcosJugador.every(b=>b.hundido)){
+    fin('La IA hundió tu flota 😢\n¡Inténtalo de nuevo!','#ff6b6b');
+    return;
+  }
+  turnoJugador=true;
+  actualizarLblTurno();
+  // si está en tab enemigo, re-render para habilitar clicks
+  if(tabActual==='enemigo') renderBatalla();
+}
+
+// ════════════════════════════════════════
+// FIN PARTIDA
+// ════════════════════════════════════════
+function fin(msg,color){
+  juegoActivo=false;
+  const lbl=document.getElementById('lbl-turno');
+  lbl.style.color=color;
+  lbl.textContent=msg;
+  renderBatalla();
+}
+
+// ════════════════════════════════════════
+// RESIZE
+// ════════════════════════════════════════
+window.addEventListener('resize',()=>{
+  const s=document.querySelector('.screen.on');
+  if(!s) return;
+  if(s.id==='s-colocar'){ calcCS('board-colocar'); renderColocar(); }
+  if(s.id==='s-batalla'){ calcCS('board-batalla'); renderBatalla(); }
+});
+
+// Service Worker
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
