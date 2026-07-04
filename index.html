@@ -12,7 +12,6 @@
 html, body { background: #0d1b2a; color: white; font-family: Helvetica, Arial, sans-serif; min-height: 100%; overflow-x: hidden; }
 #app { display: flex; flex-direction: column; align-items: center; padding-bottom: 24px; }
 
-/* ── Pantallas ── */
 .screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 440px; padding: 0 12px; }
 .screen.on { display: flex; }
 
@@ -23,45 +22,25 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
 .btn-blue  { background: #1a5276; border: 1px solid #00d4ff; color: #00d4ff; }
 .btn-green { background: #1e8449; }
 .btn-grey  { background: #2c3e50; color: #aaaaaa; }
-.btn-red   { background: #922b21; }
 .btn-menu  { background: #1a3a5c; color: #00d4ff; border: 1px solid #00d4ff; }
 
 .row2 { display: flex; gap: 8px; width: 100%; margin: 5px 0; }
 .row2 .btn { margin: 0; flex: 1; }
 
-/* ── Reglas ── */
 .rules { background: #0a2236; border: 1px solid #1a5276; border-radius: 8px; padding: 14px; font-size: 13px; color: #ccddee; line-height: 1.7; width: 100%; margin-bottom: 14px; }
 .rules b { color: #00d4ff; }
 
-/* ── Tabs ── */
 .tabs { display: flex; width: 100%; margin-bottom: 8px; gap: 6px; }
 .tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
 .tab.active { border-color: #00d4ff; color: #00d4ff; background: #0a2236; }
 .tab.inactive { color: #556677; background: #0a1520; }
 
-/* ── Tablero ── */
-.board-wrap { position: relative; margin: 0 auto; }
-.board-labels-top { display: flex; padding-left: 20px; }
-.board-labels-top span, .board-row-num { font-size: 11px; color: #556677; text-align: center; display: flex; align-items: center; justify-content: center; }
-.board-row { display: flex; }
 .cell {
-  border: 1px solid #1a3a5c;
-  background: #0a2236;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  transition: background 0.1s;
-  position: relative;
+  border: 1px solid #1a3a5c; background: #0a2236;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: background 0.1s; position: relative;
 }
-.cell.ship   { background: #1e6b3c; }
-.cell.placing{ background: #c0851a; }
-.cell.invalid{ background: #7b241c; }
-.cell.hit    { background: #922b21; }
-.cell.miss   { background: #1a3a5c; }
-.cell.sunk   { background: #6e1c15; }
-.cell.hover  { background: #1a5276; }
 
-/* ── Panel barcos ── */
 .fleet-panel { width: 100%; background: #0a1e30; border: 1px solid #1a3a5c; border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
 .fleet-panel h3 { font-size: 13px; color: #8899aa; margin-bottom: 8px; }
 .fleet-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #0d2a40; font-size: 13px; }
@@ -75,10 +54,25 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
 .seg-y { background: #f39c12; }
 .seg-d { background: #556677; }
 
-/* ── Info turno ── */
-#lbl-turno { font-size: 14px; text-align: center; padding: 8px; min-height: 36px; }
+/* ── Turno ── */
+#lbl-turno {
+  font-size: 15px; font-weight: bold; text-align: center;
+  padding: 7px 12px; margin: 4px 0 6px;
+  border-radius: 20px; background: #0a2236;
+  border: 1px solid #1a3a5c; width: 100%;
+  min-height: 36px; letter-spacing: 0.5px;
+}
 
-/* ── Olas animación ── */
+/* ── Pantalla FIN ── */
+#s-fin { text-align: center; }
+#fin-titulo {
+  font-size: 28px; font-weight: bold; letter-spacing: 2px;
+  margin: 18px 0 6px; text-shadow: 0 0 20px currentColor;
+}
+#fin-canvas { display: block; margin: 10px auto; border-radius: 12px; }
+#fin-disparos { font-size: 14px; color: #8899aa; margin: 8px 0 16px; }
+
+/* ── Animaciones ── */
 @keyframes ripple {
   0%   { transform: scale(0); opacity: 1; }
   100% { transform: scale(2.5); opacity: 0; }
@@ -86,8 +80,7 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
 .ripple-fx {
   position: absolute; width: 80%; height: 80%;
   border-radius: 50%; border: 2px solid #00d4ff;
-  animation: ripple 0.5s ease-out forwards;
-  pointer-events: none;
+  animation: ripple 0.5s ease-out forwards; pointer-events: none;
 }
 @keyframes boom {
   0%   { transform: scale(0.5); opacity: 1; }
@@ -96,9 +89,12 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
 .boom-fx {
   position: absolute; width: 90%; height: 90%;
   border-radius: 50%; background: #ff6b00;
-  animation: boom 0.4s ease-out forwards;
-  pointer-events: none;
+  animation: boom 0.4s ease-out forwards; pointer-events: none;
 }
+@keyframes pulso {
+  0%,100% { opacity:1; } 50% { opacity:0.6; }
+}
+.pulsando { animation: pulso 1.2s ease-in-out infinite; }
 </style>
 </head>
 <body>
@@ -117,7 +113,7 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
     <b>Cómo jugar:</b><br>
     1. Coloca tus 4 barcos en el tablero.<br>
     2. Toca <b>Mar enemigo</b> para disparar.<br>
-    3. 💥 = tocado · ● = agua<br>
+    3. 💥 = tocado &nbsp;·&nbsp; ● = agua<br>
     4. Hunde todos los barcos enemigos para ganar.
   </div>
   <button class="btn btn-green" onclick="irColocar()">▶ JUGAR</button>
@@ -127,14 +123,11 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
 <div class="screen" id="s-colocar">
   <h1>⚓ COLOCA TU FLOTA</h1>
   <p class="sub" id="lbl-colocar">Coloca el Portaaviones (4)</p>
-
   <div id="board-colocar"></div>
-
   <div class="fleet-panel">
     <h3>Barcos a colocar:</h3>
     <div id="fleet-list"></div>
   </div>
-
   <div class="row2">
     <button class="btn btn-blue" onclick="rotar()">↻ Rotar</button>
     <button class="btn btn-grey" onclick="colocarAleatorio()">🎲 Aleatorio</button>
@@ -147,32 +140,36 @@ h1 { font-size: 22px; color: #00d4ff; text-align: center; margin: 20px 0 4px; le
 
 <!-- ══ BATALLA ══ -->
 <div class="screen" id="s-batalla">
-  <h1 style="margin-bottom:6px;">⚓ BATALLA</h1>
+  <h1 style="margin-bottom:4px;">⚓ BATALLA</h1>
   <div id="lbl-turno"></div>
-
   <div class="tabs">
     <div class="tab active" id="tab-tuyo" onclick="verTab('tuyo')">Tu mar</div>
     <div class="tab inactive" id="tab-enemigo" onclick="verTab('enemigo')">Mar enemigo</div>
   </div>
-
   <div id="board-batalla"></div>
-
   <div class="fleet-panel" id="panel-batalla">
     <h3 id="panel-titulo">Tu flota:</h3>
     <div id="fleet-batalla"></div>
   </div>
-
   <div class="row2" style="margin-top:8px;">
     <button class="btn btn-grey" onclick="irMenu()">← Menú</button>
     <button class="btn btn-blue" onclick="irColocar()">Reiniciar</button>
   </div>
 </div>
 
+<!-- ══ PANTALLA FIN ══ -->
+<div class="screen" id="s-fin">
+  <div id="fin-titulo"></div>
+  <canvas id="fin-canvas" width="300" height="220"></canvas>
+  <div id="fin-disparos"></div>
+  <div style="width:100%;max-width:440px;padding:0 12px;">
+    <button class="btn btn-green" onclick="irColocar()">▶ JUGAR DE NUEVO</button>
+    <button class="btn btn-grey" style="margin-top:6px;" onclick="irMenu()">← MENÚ</button>
+  </div>
+</div>
+
 </div>
 <script>
-// ════════════════════════════════════════
-// DATOS
-// ════════════════════════════════════════
 const BARCOS_DEF = [
   { nombre: 'Portaaviones', tam: 4 },
   { nombre: 'Destructor',   tam: 3 },
@@ -181,36 +178,26 @@ const BARCOS_DEF = [
 ];
 const N = 8;
 
-// ════════════════════════════════════════
-// ESTADO
-// ════════════════════════════════════════
 let csSize = 0;
-let orientacion = 'H'; // H | V
-let barcosJugador = [];  // [{nombre,tam,celdas:[{f,c}]}]
+let orientacion = 'H';
+let barcosJugador = [];
 let barcosIA = [];
-let barcoIdx = 0;        // índice barco actual en colocación
-
-let tableroJugador = []; // N×N: null | 'ship' | 'hit' | 'sunk'
-let tableroIA = [];      // N×N: null | 'ship' | 'hit' | 'miss' | 'sunk'
-let tableroJugadorVisto = []; // lo que ve el jugador de su mar
-
+let barcoIdx = 0;
+let tableroJugador = [];
+let tableroIA = [];
+let tableroJugadorVisto = [];
 let tabActual = 'tuyo';
 let turnoJugador = true;
 let juegoActivo = false;
-
 let hoverCeldas = [];
+let disparosJugador = 0;
 
-// ════════════════════════════════════════
-// NAVEGACIÓN
-// ════════════════════════════════════════
+// ── Navegación ──
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); document.getElementById(id).classList.add('on'); }
 function irMenu(){ juegoActivo=false; show('s-menu'); }
 
 function irColocar(){
-  barcosJugador=[];
-  barcoIdx=0;
-  orientacion='H';
-  hoverCeldas=[];
+  barcosJugador=[]; barcoIdx=0; orientacion='H'; hoverCeldas=[]; disparosJugador=0;
   initTablero(tableroJugador);
   show('s-colocar');
   calcCS('board-colocar');
@@ -227,9 +214,7 @@ function irBatalla(){
   renderFleetBatalla();
 }
 
-// ════════════════════════════════════════
-// UTILIDADES TABLERO
-// ════════════════════════════════════════
+// ── Tablero utils ──
 function initTablero(t){ for(let i=0;i<N;i++){t[i]=[];for(let j=0;j<N;j++)t[i][j]=null;} }
 
 function calcCS(containerId){
@@ -242,9 +227,7 @@ function celdaId(prefix,f,c){ return prefix+'-'+f+'-'+c; }
 function buildBoard(containerId, prefix, clickFn, hoverFn, hoverOutFn){
   const cont = document.getElementById(containerId);
   cont.innerHTML='';
-  const labW = 20, total = labW + N*csSize;
-
-  // fila etiquetas superior
+  const labW = 20;
   const topRow = document.createElement('div');
   topRow.style.cssText=`display:flex;padding-left:${labW}px;`;
   'ABCDEFGH'.split('').forEach(l=>{
@@ -254,11 +237,9 @@ function buildBoard(containerId, prefix, clickFn, hoverFn, hoverOutFn){
     topRow.appendChild(s);
   });
   cont.appendChild(topRow);
-
   for(let f=0;f<N;f++){
     const row=document.createElement('div');
     row.style.display='flex';
-    // número fila
     const num=document.createElement('span');
     num.textContent=f+1;
     num.style.cssText=`width:${labW}px;font-size:11px;color:#556677;display:flex;align-items:center;justify-content:center;`;
@@ -271,12 +252,6 @@ function buildBoard(containerId, prefix, clickFn, hoverFn, hoverOutFn){
       if(clickFn) cell.addEventListener('click',()=>clickFn(f,c));
       if(hoverFn) cell.addEventListener('mouseenter',()=>hoverFn(f,c));
       if(hoverOutFn) cell.addEventListener('mouseleave',hoverOutFn);
-      if(hoverFn){ cell.addEventListener('touchmove',e=>{
-        e.preventDefault();
-        const t=e.touches[0];
-        const el=document.elementFromPoint(t.clientX,t.clientY);
-        if(el && el.dataset.f!==undefined) hoverFn(parseInt(el.dataset.f),parseInt(el.dataset.c));
-      },{passive:false}); }
       cell.dataset.f=f; cell.dataset.c=c;
       row.appendChild(cell);
     }
@@ -295,28 +270,23 @@ function addFx(prefix,f,c,tipo){
   const el=document.getElementById(celdaId(prefix,f,c));
   if(!el) return;
   const fx=document.createElement('div');
-  fx.className= tipo==='boom'?'boom-fx':'ripple-fx';
+  fx.className=tipo==='boom'?'boom-fx':'ripple-fx';
   el.appendChild(fx);
   setTimeout(()=>fx.remove(),600);
 }
 
-// ════════════════════════════════════════
-// FASE COLOCAR
-// ════════════════════════════════════════
+// ── Colocar ──
 function renderColocar(){
   buildBoard('board-colocar','pc', clickColocar, hoverColocar, hoverSalir);
   refrescarTableroColocar();
 }
 
 function refrescarTableroColocar(){
-  // fondo limpio
   for(let f=0;f<N;f++) for(let c=0;c<N;c++) setCell('pc',f,c,{bg:'#0a2236',txt:''});
-  // barcos ya puestos
-  barcosJugador.forEach(b=> b.celdas.forEach(({f,c})=> setCell('pc',f,c,{bg:'#1e6b3c'})));
-  // hover
+  barcosJugador.forEach(b=>b.celdas.forEach(({f,c})=>setCell('pc',f,c,{bg:'#1e6b3c'})));
   if(hoverCeldas.length){
-    const valido = hoverCeldas.every(({f,c})=>f>=0&&f<N&&c>=0&&c<N&&tableroJugador[f][c]===null);
-    hoverCeldas.forEach(({f,c})=>{ if(f>=0&&f<N&&c>=0&&c<N) setCell('pc',f,c,{bg: valido?'#c0851a':'#7b241c'}); });
+    const valido=hoverCeldas.every(({f,c})=>f>=0&&f<N&&c>=0&&c<N&&tableroJugador[f][c]===null);
+    hoverCeldas.forEach(({f,c})=>{ if(f>=0&&f<N&&c>=0&&c<N) setCell('pc',f,c,{bg:valido?'#c0851a':'#7b241c'}); });
   }
 }
 
@@ -340,7 +310,7 @@ function clickColocar(f,c){
   const valido=celdas.every(({f:ff,c:cc})=>ff>=0&&ff<N&&cc>=0&&cc<N&&tableroJugador[ff][cc]===null);
   if(!valido) return;
   celdas.forEach(({f:ff,c:cc})=>tableroJugador[ff][cc]='ship');
-  barcosJugador.push({...def, celdas});
+  barcosJugador.push({...def,celdas});
   barcoIdx++;
   hoverCeldas=[];
   refrescarTableroColocar();
@@ -357,8 +327,7 @@ function rotar(){ orientacion=orientacion==='H'?'V':'H'; refrescarTableroColocar
 function actualizarLblColocar(){
   const lbl=document.getElementById('lbl-colocar');
   if(barcoIdx<BARCOS_DEF.length){
-    const d=BARCOS_DEF[barcoIdx];
-    lbl.textContent=`Coloca el ${d.nombre} (${d.tam})`;
+    lbl.textContent=`Coloca el ${BARCOS_DEF[barcoIdx].nombre} (${BARCOS_DEF[barcoIdx].tam}) — ${barcoIdx+1} de ${BARCOS_DEF.length}`;
   } else {
     lbl.textContent='¡Flota lista! Pulsa Empezar.';
   }
@@ -370,8 +339,7 @@ function renderFleetList(){
   BARCOS_DEF.forEach((d,i)=>{
     const div=document.createElement('div');
     div.className='fleet-item '+(i<barcoIdx?'done':i===barcoIdx?'active':'pending');
-    const segs=document.createElement('div');
-    segs.className='fleet-seg';
+    const segs=document.createElement('div'); segs.className='fleet-seg';
     for(let s=0;s<d.tam;s++){
       const sq=document.createElement('span');
       sq.className=i<barcoIdx?'seg-d':i===barcoIdx?'seg-y':'seg-g';
@@ -383,79 +351,60 @@ function renderFleetList(){
     div.appendChild(txt);
     cont.appendChild(div);
   });
+  actualizarLblColocar();
 }
 
 function colocarAleatorio(){
-  // reset
-  initTablero(tableroJugador);
-  barcosJugador=[];
-  barcoIdx=0;
+  initTablero(tableroJugador); barcosJugador=[]; barcoIdx=0;
   BARCOS_DEF.forEach(def=>{
     let placed=false, tries=0;
-    while(!placed && tries<500){
+    while(!placed&&tries<500){
       tries++;
       const ori=Math.random()<0.5?'H':'V';
-      const f=Math.floor(Math.random()*N);
-      const c=Math.floor(Math.random()*N);
+      const f=Math.floor(Math.random()*N), c=Math.floor(Math.random()*N);
       const celdas=celdas_barco(f,c,def.tam,ori);
       const ok=celdas.every(({f:ff,c:cc})=>ff>=0&&ff<N&&cc>=0&&cc<N&&tableroJugador[ff][cc]===null);
       if(ok){ celdas.forEach(({f:ff,c:cc})=>tableroJugador[ff][cc]='ship'); barcosJugador.push({...def,celdas}); barcoIdx++; placed=true; }
     }
   });
   hoverCeldas=[];
-  refrescarTableroColocar();
-  renderFleetList();
-  actualizarLblColocar();
+  refrescarTableroColocar(); renderFleetList();
   document.getElementById('btn-empezar').disabled=false;
   document.getElementById('btn-empezar').style.opacity='1';
 }
 
-// ════════════════════════════════════════
-// INICIO BATALLA
-// ════════════════════════════════════════
+// ── Empezar ──
 function empezarBatalla(){
   if(barcoIdx<BARCOS_DEF.length) return;
-  // IA coloca barcos
-  initTablero(tableroIA);
-  barcosIA=[];
+  initTablero(tableroIA); barcosIA=[];
   BARCOS_DEF.forEach(def=>{
     let placed=false, tries=0;
-    while(!placed && tries<500){
+    while(!placed&&tries<500){
       tries++;
       const ori=Math.random()<0.5?'H':'V';
-      const f=Math.floor(Math.random()*N);
-      const c=Math.floor(Math.random()*N);
+      const f=Math.floor(Math.random()*N), c=Math.floor(Math.random()*N);
       const celdas=celdas_barco(f,c,def.tam,ori);
       const ok=celdas.every(({f:ff,c:cc})=>ff>=0&&ff<N&&cc>=0&&cc<N&&tableroIA[ff][cc]===null);
       if(ok){ celdas.forEach(({f:ff,c:cc})=>tableroIA[ff][cc]='ship'); barcosIA.push({...def,celdas,hundido:false}); placed=true; }
     }
   });
-  // init visto jugador
   initTablero(tableroJugadorVisto);
   for(let f=0;f<N;f++) for(let c=0;c<N;c++) tableroJugadorVisto[f][c]=tableroJugador[f][c];
-  turnoJugador=true;
-  juegoActivo=true;
+  turnoJugador=true; juegoActivo=true; disparosJugador=0;
   iaMemoria={pendientes:[], disparados:new Set()};
   irBatalla();
 }
 
-// ════════════════════════════════════════
-// TABS
-// ════════════════════════════════════════
+// ── Tabs ──
 function verTab(tab){
-  tabActual=tab;
-  activarTab(tab);
-  renderBatalla();
-  renderFleetBatalla();
+  tabActual=tab; activarTab(tab); renderBatalla(); renderFleetBatalla();
 }
 function activarTab(tab){
   document.getElementById('tab-tuyo').className='tab '+(tab==='tuyo'?'active':'inactive');
   document.getElementById('tab-enemigo').className='tab '+(tab==='enemigo'?'active':'inactive');
 }
 
-// ════════════════════════════════════════
-// RENDERIZAR BATALLA
-// ════════════════════════════════════════
+// ── Renderizar batalla ──
 function renderBatalla(){
   if(tabActual==='tuyo'){
     buildBoard('board-batalla','pb',null,null,null);
@@ -492,13 +441,15 @@ function pintarTableroIA(){
 
 function actualizarLblTurno(){
   const lbl=document.getElementById('lbl-turno');
-  if(!juegoActivo){ lbl.textContent=''; return; }
+  if(!juegoActivo){ lbl.textContent=''; lbl.className=''; return; }
   if(turnoJugador){
     lbl.style.color='#00d4ff';
-    lbl.textContent= tabActual==='enemigo' ? '🎯 Toca para disparar' : '👁 Viendo tu mar';
+    lbl.className='pulsando';
+    lbl.textContent= tabActual==='enemigo' ? '🎯 Turno del JUGADOR — toca para disparar' : '🎯 Turno del JUGADOR — ve al Mar enemigo';
   } else {
     lbl.style.color='#ff6b6b';
-    lbl.textContent='⏳ La IA está disparando...';
+    lbl.className='pulsando';
+    lbl.textContent='⏳ Turno de la IA — disparando...';
   }
 }
 
@@ -507,18 +458,16 @@ function renderFleetBatalla(){
   const cont=document.getElementById('fleet-batalla');
   cont.innerHTML='';
   const esIA=tabActual==='enemigo';
-  titulo.textContent= esIA ? 'Flota enemiga:' : 'Tu flota:';
-  const barcos= esIA ? barcosIA : barcosJugador;
+  titulo.textContent=esIA?'Flota enemiga:':'Tu flota:';
+  const barcos=esIA?barcosIA:barcosJugador;
   barcos.forEach(b=>{
     const div=document.createElement('div');
     div.className='fleet-item '+(b.hundido?'done':'pending');
-    const segs=document.createElement('div');
-    segs.className='fleet-seg';
+    const segs=document.createElement('div'); segs.className='fleet-seg';
     b.celdas.forEach(({f,c})=>{
       const sq=document.createElement('span');
-      const t= esIA ? tableroIA[f][c] : tableroJugadorVisto[f][c];
-      sq.style.cssText=`width:14px;height:14px;border-radius:2px;display:inline-block;background:${
-        b.hundido?'#6e1c15': t==='hit'||t==='sunk'?'#e74c3c': t==='ship'?'#2ecc71':'#556677'};`;
+      const t=esIA?tableroIA[f][c]:tableroJugadorVisto[f][c];
+      sq.style.cssText=`width:14px;height:14px;border-radius:2px;display:inline-block;background:${b.hundido?'#6e1c15':t==='hit'||t==='sunk'?'#e74c3c':t==='ship'?'#2ecc71':'#556677'};`;
       segs.appendChild(sq);
     });
     div.appendChild(segs);
@@ -529,19 +478,17 @@ function renderFleetBatalla(){
   });
 }
 
-// ════════════════════════════════════════
-// DISPARAR (JUGADOR)
-// ════════════════════════════════════════
+// ── Disparar jugador ──
 function clickEnemigo(f,c){
   if(!juegoActivo||!turnoJugador) return;
   const v=tableroIA[f][c];
   if(v==='hit'||v==='miss'||v==='sunk') return;
+  disparosJugador++;
   if(v==='ship'){
     tableroIA[f][c]='hit';
     addFx('pb',f,c,'boom');
-    // ¿hundido?
     const barco=barcosIA.find(b=>b.celdas.some(p=>p.f===f&&p.c===c));
-    if(barco && barco.celdas.every(({f:ff,c:cc})=>tableroIA[ff][cc]==='hit'||tableroIA[ff][cc]==='sunk')){
+    if(barco&&barco.celdas.every(({f:ff,c:cc})=>tableroIA[ff][cc]==='hit'||tableroIA[ff][cc]==='sunk')){
       barco.celdas.forEach(({f:ff,c:cc})=>tableroIA[ff][cc]='sunk');
       barco.hundido=true;
     }
@@ -559,63 +506,60 @@ function clickEnemigo(f,c){
 
 function verificarFinJugador(){
   if(barcosIA.every(b=>b.hundido)){
-    fin('¡¡VICTORIA!! Hundiste toda la flota enemiga 🎉','#00d4ff');
+    mostrarFin(true);
     return true;
   }
   return false;
 }
 
-// ════════════════════════════════════════
-// IA — lógica de caza
-// ════════════════════════════════════════
+// ── IA ──
 let iaMemoria={pendientes:[], disparados:new Set()};
 
 function turnoIA(){
   if(!juegoActivo) return;
   let objetivo=null;
-  // si hay celdas pendientes de explorar
-  while(iaMemoria.pendientes.length && !objetivo){
+  while(iaMemoria.pendientes.length&&!objetivo){
     const p=iaMemoria.pendientes.shift();
     if(!iaMemoria.disparados.has(p.f+','+p.c)) objetivo=p;
   }
-  // si no, disparo aleatorio (evita zonas sin barcos con peso)
   if(!objetivo){
     let intentos=0;
-    while(!objetivo && intentos<200){
+    while(!objetivo&&intentos<200){
       intentos++;
-      const f=Math.floor(Math.random()*N);
-      const c=Math.floor(Math.random()*N);
+      const f=Math.floor(Math.random()*N), c=Math.floor(Math.random()*N);
       if(!iaMemoria.disparados.has(f+','+c)){
-        // checkerboard bias
         if((f+c)%2===0||Math.random()<0.35) objetivo={f,c};
       }
     }
   }
   if(!objetivo) return;
-
   const {f,c}=objetivo;
   iaMemoria.disparados.add(f+','+c);
   const v=tableroJugadorVisto[f][c];
-
+  let hundioBarco=false;
   if(v==='ship'){
     tableroJugadorVisto[f][c]='hit';
-    // añadir adyacentes
     [[f-1,c],[f+1,c],[f,c-1],[f,c+1]].forEach(([nf,nc])=>{
       if(nf>=0&&nf<N&&nc>=0&&nc<N&&!iaMemoria.disparados.has(nf+','+nc))
         iaMemoria.pendientes.unshift({f:nf,c:nc});
     });
-    // ¿hundido?
     const barco=barcosJugador.find(b=>b.celdas.some(p=>p.f===f&&p.c===c));
-    if(barco && barco.celdas.every(({f:ff,c:cc})=>tableroJugadorVisto[ff][cc]==='hit'||tableroJugadorVisto[ff][cc]==='sunk')){
+    if(barco&&barco.celdas.every(({f:ff,c:cc})=>tableroJugadorVisto[ff][cc]==='hit'||tableroJugadorVisto[ff][cc]==='sunk')){
       barco.celdas.forEach(({f:ff,c:cc})=>tableroJugadorVisto[ff][cc]='sunk');
       barco.hundido=true;
       iaMemoria.pendientes=[];
+      hundioBarco=true;
     }
   } else {
     tableroJugadorVisto[f][c]='miss';
   }
 
-  // animar si estamos viendo tu mar
+  // Si hundió un barco → cambiar automáticamente a "Tu mar"
+  if(hundioBarco && tabActual!=='tuyo'){
+    tabActual='tuyo';
+    activarTab('tuyo');
+  }
+
   if(tabActual==='tuyo'){
     const hit=tableroJugadorVisto[f][c]==='hit'||tableroJugadorVisto[f][c]==='sunk';
     addFx('pb',f,c,hit?'boom':'ripple');
@@ -624,29 +568,155 @@ function turnoIA(){
   }
 
   if(barcosJugador.every(b=>b.hundido)){
-    fin('La IA hundió tu flota 😢\n¡Inténtalo de nuevo!','#ff6b6b');
+    mostrarFin(false);
     return;
   }
   turnoJugador=true;
   actualizarLblTurno();
-  // si está en tab enemigo, re-render para habilitar clicks
   if(tabActual==='enemigo') renderBatalla();
 }
 
-// ════════════════════════════════════════
-// FIN PARTIDA
-// ════════════════════════════════════════
-function fin(msg,color){
+// ── Pantalla FIN con dibujo ──
+function mostrarFin(ganaJugador){
   juegoActivo=false;
-  const lbl=document.getElementById('lbl-turno');
-  lbl.style.color=color;
-  lbl.textContent=msg;
-  renderBatalla();
+  show('s-fin');
+
+  const titulo=document.getElementById('fin-titulo');
+  titulo.textContent=ganaJugador?'🏆 GANA EL JUGADOR':'💀 GANA LA IA';
+  titulo.style.color=ganaJugador?'#00d4ff':'#ff4444';
+
+  document.getElementById('fin-disparos').textContent=
+    ganaJugador
+      ? `Hundiste la flota enemiga en ${disparosJugador} disparos`
+      : `La IA destruyó tu flota. Usaste ${disparosJugador} disparos.`;
+
+  dibujarFinCanvas(ganaJugador);
 }
 
-// ════════════════════════════════════════
-// RESIZE
-// ════════════════════════════════════════
+function dibujarFinCanvas(ganaJugador){
+  const canvas=document.getElementById('fin-canvas');
+  const W=300, H=220;
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Fondo mar
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#0a1a2e');
+  grad.addColorStop(1,'#0a3a5c');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,W,H);
+
+  // Olas
+  ctx.strokeStyle='#1a5276'; ctx.lineWidth=1.5;
+  for(let y=160;y<H;y+=18){
+    ctx.beginPath();
+    for(let x=0;x<W;x+=4){
+      ctx.lineTo(x, y+Math.sin(x/20)*4);
+    }
+    ctx.stroke();
+  }
+
+  // Portaaviones (cuerpo)
+  const cx=W/2, cy=120;
+  // casco
+  ctx.fillStyle= ganaJugador?'#1a3a5c':'#3a1a1a';
+  ctx.beginPath();
+  ctx.moveTo(cx-90, cy+20);
+  ctx.lineTo(cx+90, cy+20);
+  ctx.lineTo(cx+80, cy+40);
+  ctx.lineTo(cx-80, cy+40);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='#334466'; ctx.lineWidth=2; ctx.stroke();
+
+  // cubierta
+  ctx.fillStyle= ganaJugador?'#1e3a5c':'#4a2a2a';
+  ctx.fillRect(cx-85, cy+5, 170, 18);
+
+  // torre
+  ctx.fillStyle= ganaJugador?'#2a4a6c':'#5a3a3a';
+  ctx.fillRect(cx+10, cy-20, 35, 28);
+  ctx.fillRect(cx+15, cy-35, 20, 18);
+
+  // pista de aterrizaje
+  ctx.strokeStyle= ganaJugador?'#446688':'#664444';
+  ctx.lineWidth=2;
+  ctx.setLineDash([10,6]);
+  ctx.beginPath(); ctx.moveTo(cx-80,cy+14); ctx.lineTo(cx+5,cy+14); ctx.stroke();
+  ctx.setLineDash([]);
+
+  if(!ganaJugador){
+    // Barco hundiéndose — inclinado
+    ctx.save();
+    ctx.translate(cx, cy+20);
+    ctx.rotate(0.25);
+    ctx.fillStyle='#3a1a1a';
+    ctx.fillRect(-30,-8,60,16);
+    ctx.restore();
+    // Explosiones
+    dibujarExplosion(ctx, cx-20, cy-10, 28, '#ff6600');
+    dibujarExplosion(ctx, cx+30, cy+5,  20, '#ff3300');
+    dibujarExplosion(ctx, cx-50, cy+15, 16, '#ffaa00');
+    // Humo
+    dibujarHumo(ctx, cx, cy-30);
+  } else {
+    // Barco victorioso — ondea bandera
+    ctx.fillStyle='#00d4ff';
+    ctx.beginPath();
+    ctx.moveTo(cx+15, cy-35);
+    ctx.lineTo(cx+38, cy-26);
+    ctx.lineTo(cx+15, cy-18);
+    ctx.closePath();
+    ctx.fill();
+    // Estela de victoria
+    ctx.strokeStyle='#00d4ff44'; ctx.lineWidth=3;
+    for(let i=1;i<=3;i++){
+      ctx.beginPath();
+      ctx.arc(cx, cy+40, 20*i, Math.PI*0.8, Math.PI*0.2, true);
+      ctx.stroke();
+    }
+    // Destellos
+    [[cx-60,cy-30],[cx+60,cy-20],[cx,cy-50]].forEach(([x,y])=>{
+      ctx.strokeStyle='#ffcc00'; ctx.lineWidth=2;
+      for(let a=0;a<8;a++){
+        const ang=a*Math.PI/4;
+        ctx.beginPath();
+        ctx.moveTo(x+Math.cos(ang)*6, y+Math.sin(ang)*6);
+        ctx.lineTo(x+Math.cos(ang)*14, y+Math.sin(ang)*14);
+        ctx.stroke();
+      }
+    });
+  }
+}
+
+function dibujarExplosion(ctx, x, y, r, color){
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,'#ffffff');
+  g.addColorStop(0.3,color);
+  g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  // rayos
+  ctx.strokeStyle=color; ctx.lineWidth=2;
+  for(let a=0;a<8;a++){
+    const ang=a*Math.PI/4;
+    ctx.beginPath();
+    ctx.moveTo(x+Math.cos(ang)*r*0.8, y+Math.sin(ang)*r*0.8);
+    ctx.lineTo(x+Math.cos(ang)*(r+8), y+Math.sin(ang)*(r+8));
+    ctx.stroke();
+  }
+}
+
+function dibujarHumo(ctx, x, y){
+  for(let i=0;i<5;i++){
+    const rx=x+(i-2)*12, ry=y-i*14;
+    const r=10+i*3;
+    ctx.fillStyle=`rgba(80,80,80,${0.5-i*0.08})`;
+    ctx.beginPath(); ctx.arc(rx,ry,r,0,Math.PI*2); ctx.fill();
+  }
+}
+
+// ── Resize ──
 window.addEventListener('resize',()=>{
   const s=document.querySelector('.screen.on');
   if(!s) return;
@@ -654,7 +724,6 @@ window.addEventListener('resize',()=>{
   if(s.id==='s-batalla'){ calcCS('board-batalla'); renderBatalla(); }
 });
 
-// Service Worker
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
